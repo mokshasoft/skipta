@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
+import Bootstrap.Tab as Tab
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -50,7 +51,8 @@ main =
 
 
 type alias Model =
-    { email : String
+    { tabState : Tab.State
+    , email : String
     , password : String
     , debugMsg : String
     }
@@ -58,7 +60,8 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { email = ""
+    ( { tabState = Tab.initialState
+      , email = ""
       , password = ""
       , debugMsg = ""
       }
@@ -96,7 +99,8 @@ sendLogin email password =
 
 
 type Msg
-    = ChangeEmail String
+    = TabMsg Tab.State
+    | ChangeEmail String
     | ChangePassword String
     | SendLogin
     | ReceiveLogin (Result Http.Error ())
@@ -105,6 +109,11 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        TabMsg state ->
+            ( { model | tabState = state }
+            , Cmd.none
+            )
+
         ChangeEmail email ->
             ( { model
                 | email = email
@@ -143,18 +152,17 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Tab.subscriptions model.tabState TabMsg
 
 
 
 -- VIEW
 
 
-view : Model -> Html Msg
-view model =
+viewLogin : Model -> Html Msg
+viewLogin model =
     Grid.container []
-        [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
-        , Grid.row []
+        [ Grid.row []
             [ Grid.col []
                 [ div
                     []
@@ -197,6 +205,35 @@ view model =
                     )
                 , label []
                     [ text <| "debug message: " ++ model.debugMsg ]
+                ]
+            ]
+        ]
+
+
+view : Model -> Html Msg
+view model =
+    Grid.container []
+        [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
+        , Grid.row []
+            [ Grid.col []
+                [ div []
+                    [ Tab.config TabMsg
+                        |> Tab.withAnimation
+                        |> Tab.center
+                        |> Tab.items
+                            [ Tab.item
+                                { id = "tabLogin"
+                                , link = Tab.link [] [ text "Sign in" ]
+                                , pane = Tab.pane [] [ viewLogin model ]
+                                }
+                            , Tab.item
+                                { id = "tabSignUp"
+                                , link = Tab.link [] [ text "Join now" ]
+                                , pane = Tab.pane [] [ text "Tab 2 Content" ]
+                                }
+                            ]
+                        |> Tab.view model.tabState
+                    ]
                 ]
             ]
         ]

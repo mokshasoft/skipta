@@ -161,11 +161,11 @@ subscriptions model =
 
 viewLogin : Model -> Html Msg
 viewLogin model =
-    Grid.container []
+    Grid.container [ class "text-center m-3" ]
         [ Grid.row []
             [ Grid.col []
                 [ div
-                    []
+                    [ class "m-1" ]
                     [ input [ onInput ChangeEmail, placeholder "email" ]
                         []
                     ]
@@ -174,7 +174,7 @@ viewLogin model =
         , Grid.row []
             [ Grid.col []
                 [ div
-                    []
+                    [ class "m-1" ]
                     [ input [ onInput ChangePassword, placeholder "password" ]
                         []
                     ]
@@ -183,7 +183,7 @@ viewLogin model =
         , Grid.row []
             [ Grid.col []
                 [ div
-                    []
+                    [ class "m-3" ]
                     [ button [ onClick SendLogin ]
                         [ text "Login" ]
                     ]

@@ -1,0 +1,3 @@
+backend/.stack-work/
+backend/stack.yaml.lock
+frontend/elm-stuff/

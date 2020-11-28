@@ -210,6 +210,39 @@ viewLogin model =
         ]
 
 
+viewJoinNow : Model -> Html Msg
+viewJoinNow model =
+    Grid.container [ class "text-center m-3" ]
+        [ Grid.row []
+            [ Grid.col []
+                [ div
+                    [ class "m-1" ]
+                    [ input [ onInput ChangeEmail, placeholder "email" ]
+                        []
+                    ]
+                ]
+            ]
+        , Grid.row []
+            [ Grid.col []
+                [ div
+                    [ class "m-1" ]
+                    [ input [ onInput ChangePassword, placeholder "password" ]
+                        []
+                    ]
+                ]
+            ]
+        , Grid.row []
+            [ Grid.col []
+                [ div
+                    [ class "m-3" ]
+                    [ button [ onClick SendLogin ]
+                        [ text "Join now" ]
+                    ]
+                ]
+            ]
+        ]
+
+
 view : Model -> Html Msg
 view model =
     Grid.container []
@@ -229,7 +262,7 @@ view model =
                             , Tab.item
                                 { id = "tabSignUp"
                                 , link = Tab.link [] [ text "Join now" ]
-                                , pane = Tab.pane [] [ text "Tab 2 Content" ]
+                                , pane = Tab.pane [] [ viewJoinNow model ]
                                 }
                             ]
                         |> Tab.view model.tabState

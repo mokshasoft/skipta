@@ -1,5 +1,6 @@
 module Main exposing (..)
 
+import Bootstrap.Button as Button
 import Bootstrap.CDN as CDN
 import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
@@ -11,6 +12,7 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Encode as E
 import PwHash as Pw
+import String as S
 
 
 
@@ -245,6 +247,20 @@ subscriptions model =
 -- VIEW
 
 
+disableSignIn : Model -> Bool
+disableSignIn model =
+    (S.length model.siEmail == 0)
+        || (S.length model.siPassword == 0)
+
+
+disableJoinNow : Model -> Bool
+disableJoinNow model =
+    (S.length model.jnEmail1 == 0)
+        || (S.length model.jnPassword1 == 0)
+        || (model.jnEmail1 /= model.jnEmail2)
+        || (model.jnPassword1 /= model.jnPassword2)
+
+
 viewSignIn : Model -> Html Msg
 viewSignIn model =
     Grid.container [ class "text-center m-3" ]
@@ -268,7 +284,11 @@ viewSignIn model =
             [ Grid.col []
                 [ div
                     [ class "m-3" ]
-                    [ button [ onClick SendSignIn ]
+                    [ Button.button
+                        [ Button.onClick SendSignIn
+                        , Button.primary
+                        , Button.disabled (disableSignIn model)
+                        ]
                         [ text "Login" ]
                     ]
                 ]
@@ -319,7 +339,11 @@ viewJoinNow model =
             [ Grid.col []
                 [ div
                     [ class "m-3" ]
-                    [ button [ onClick SendJoinNow ]
+                    [ Button.button
+                        [ Button.onClick SendJoinNow
+                        , Button.primary
+                        , Button.disabled (disableJoinNow model)
+                        ]
                         [ text "Join now" ]
                     ]
                 ]

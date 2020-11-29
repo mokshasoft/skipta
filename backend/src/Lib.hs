@@ -26,18 +26,18 @@ data Opts = Opts
   , port  :: Int
   }
 
-data Login = Login
+data SignIn = SignIn
   { salt :: String
   , password :: String
   } deriving (Eq)
 
-instance Show Login where
-  show (Login s p) = "{salt=" ++ show s ++ ", password=" ++ show p ++ "}"
+instance Show SignIn where
+  show (SignIn s p) = "SignIn {salt=" ++ show s ++ ", password=" ++ show p ++ "}"
 
-$(deriveJSON defaultOptions ''Login)
+$(deriveJSON defaultOptions ''SignIn)
 
 type API =
-    "login" :> ReqBody '[JSON] Login :> Post '[JSON] NoContent
+    "signin" :> ReqBody '[JSON] SignIn :> Post '[JSON] NoContent
 
 -- type Middleware = Application -> Application
 corsPolicy :: Middleware
@@ -86,10 +86,10 @@ app = serve api server
 api :: Proxy API
 api = Proxy
 
-loginH :: Login -> Handler NoContent
-loginH json = do
+signInH :: SignIn -> Handler NoContent
+signInH json = do
     liftIO $ print json
     return NoContent
 
 server :: Server API
-server = loginH
+server = signInH

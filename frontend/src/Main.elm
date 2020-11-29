@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Bootstrap.CDN as CDN
+import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
 import Bootstrap.Tab as Tab
 import Browser
@@ -159,15 +160,14 @@ subscriptions model =
 -- VIEW
 
 
-viewLogin : Model -> Html Msg
-viewLogin model =
+viewSignIn : Model -> Html Msg
+viewSignIn model =
     Grid.container [ class "text-center m-3" ]
         [ Grid.row []
             [ Grid.col []
                 [ div
                     [ class "m-1" ]
-                    [ input [ onInput ChangeEmail, placeholder "email" ]
-                        []
+                    [ Input.email [ Input.onInput ChangeEmail, Input.placeholder "E-mail" ]
                     ]
                 ]
             ]
@@ -175,8 +175,7 @@ viewLogin model =
             [ Grid.col []
                 [ div
                     [ class "m-1" ]
-                    [ input [ onInput ChangePassword, placeholder "password" ]
-                        []
+                    [ Input.password [ Input.onInput ChangePassword, Input.placeholder "Password" ]
                     ]
                 ]
             ]
@@ -217,8 +216,8 @@ viewJoinNow model =
             [ Grid.col []
                 [ div
                     [ class "m-1" ]
-                    [ input [ onInput ChangeEmail, placeholder "email" ]
-                        []
+                    [ Input.email [ Input.onInput ChangeEmail, Input.placeholder "E-mail" ]
+                    , Input.email [ Input.onInput ChangeEmail, Input.placeholder "Reenter e-mail" ]
                     ]
                 ]
             ]
@@ -226,8 +225,8 @@ viewJoinNow model =
             [ Grid.col []
                 [ div
                     [ class "m-1" ]
-                    [ input [ onInput ChangePassword, placeholder "password" ]
-                        []
+                    [ Input.password [ Input.onInput ChangePassword, Input.placeholder "Password" ]
+                    , Input.password [ Input.onInput ChangePassword, Input.placeholder "Reenter password" ]
                     ]
                 ]
             ]
@@ -257,7 +256,7 @@ view model =
                             [ Tab.item
                                 { id = "tabLogin"
                                 , link = Tab.link [] [ text "Sign in" ]
-                                , pane = Tab.pane [] [ viewLogin model ]
+                                , pane = Tab.pane [] [ viewSignIn model ]
                                 }
                             , Tab.item
                                 { id = "tabSignUp"

@@ -29,9 +29,14 @@ backendServerUrl =
     "http://localhost:3000/"
 
 
-loginEndpoint : String
-loginEndpoint =
-    backendServerUrl ++ "login"
+signInEndpoint : String
+signInEndpoint =
+    backendServerUrl ++ "signin"
+
+
+joinNowEndpoint : String
+joinNowEndpoint =
+    backendServerUrl ++ "joinnow"
 
 
 
@@ -53,8 +58,12 @@ main =
 
 type alias Model =
     { tabState : Tab.State
-    , email : String
-    , password : String
+    , siEmail : String
+    , siPassword : String
+    , jnEmail1 : String
+    , jnEmail2 : String
+    , jnPassword1 : String
+    , jnPassword2 : String
     , debugMsg : String
     }
 
@@ -62,8 +71,12 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { tabState = Tab.initialState
-      , email = ""
-      , password = ""
+      , siEmail = ""
+      , siPassword = ""
+      , jnEmail1 = ""
+      , jnEmail2 = ""
+      , jnPassword1 = ""
+      , jnPassword2 = ""
       , debugMsg = ""
       }
     , Cmd.none
@@ -74,24 +87,45 @@ init _ =
 -- HTTP
 
 
-encodeLogin : String -> String -> E.Value
-encodeLogin salt hashedPassword =
+encodeSignIn : String -> String -> E.Value
+encodeSignIn salt hashedPassword =
     E.object
         [ ( "salt", E.string salt )
         , ( "password", E.string hashedPassword )
         ]
 
 
-sendLogin : String -> String -> Cmd Msg
-sendLogin email password =
+sendSignIn : String -> String -> Cmd Msg
+sendSignIn email password =
     let
         ( salt, hashedPassword ) =
             Pw.pwhash appSalt email password
     in
     Http.post
-        { url = loginEndpoint
-        , body = Http.jsonBody (encodeLogin salt hashedPassword)
-        , expect = Http.expectWhatever ReceiveLogin
+        { url = signInEndpoint
+        , body = Http.jsonBody (encodeSignIn salt hashedPassword)
+        , expect = Http.expectWhatever ReceiveSignIn
+        }
+
+
+encodeJoinNow : String -> String -> E.Value
+encodeJoinNow salt hashedPassword =
+    E.object
+        [ ( "salt", E.string salt )
+        , ( "password", E.string hashedPassword )
+        ]
+
+
+sendJoinNow : String -> String -> Cmd Msg
+sendJoinNow email password =
+    let
+        ( salt, hashedPassword ) =
+            Pw.pwhash appSalt email password
+    in
+    Http.post
+        { url = joinNowEndpoint
+        , body = Http.jsonBody (encodeJoinNow salt hashedPassword)
+        , expect = Http.expectWhatever ReceiveJoinNow
         }
 
 
@@ -101,10 +135,16 @@ sendLogin email password =
 
 type Msg
     = TabMsg Tab.State
-    | ChangeEmail String
-    | ChangePassword String
-    | SendLogin
-    | ReceiveLogin (Result Http.Error ())
+    | SiEmail String
+    | SiPassword String
+    | JnEmail1 String
+    | JnEmail2 String
+    | JnPassword1 String
+    | JnPassword2 String
+    | SendSignIn
+    | ReceiveSignIn (Result Http.Error ())
+    | SendJoinNow
+    | ReceiveJoinNow (Result Http.Error ())
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -115,34 +155,79 @@ update msg model =
             , Cmd.none
             )
 
-        ChangeEmail email ->
+        SiEmail email ->
             ( { model
-                | email = email
+                | siEmail = email
               }
             , Cmd.none
             )
 
-        ChangePassword pass ->
+        SiPassword pass ->
             ( { model
-                | password = pass
+                | siPassword = pass
               }
             , Cmd.none
             )
 
-        SendLogin ->
+        JnEmail1 email ->
+            ( { model
+                | jnEmail1 = email
+              }
+            , Cmd.none
+            )
+
+        JnEmail2 email ->
+            ( { model
+                | jnEmail2 = email
+              }
+            , Cmd.none
+            )
+
+        JnPassword1 pass ->
+            ( { model
+                | jnPassword1 = pass
+              }
+            , Cmd.none
+            )
+
+        JnPassword2 pass ->
+            ( { model
+                | jnPassword2 = pass
+              }
+            , Cmd.none
+            )
+
+        SendSignIn ->
             ( model
-            , sendLogin model.email model.password
+            , sendSignIn model.siEmail model.siPassword
             )
 
-        ReceiveLogin result ->
+        ReceiveSignIn result ->
             case result of
                 Ok _ ->
-                    ( { model | debugMsg = "Login sent" }
+                    ( { model | debugMsg = "Sign in sent" }
                     , Cmd.none
                     )
 
                 Err _ ->
-                    ( { model | debugMsg = "Failed to login" }
+                    ( { model | debugMsg = "Failed to sign in" }
+                    , Cmd.none
+                    )
+
+        SendJoinNow ->
+            ( model
+            , sendJoinNow model.jnEmail1 model.jnPassword1
+            )
+
+        ReceiveJoinNow result ->
+            case result of
+                Ok _ ->
+                    ( { model | debugMsg = "Join now sent" }
+                    , Cmd.none
+                    )
+
+                Err _ ->
+                    ( { model | debugMsg = "Failed to join now" }
                     , Cmd.none
                     )
 
@@ -167,7 +252,7 @@ viewSignIn model =
             [ Grid.col []
                 [ div
                     [ class "m-1" ]
-                    [ Input.email [ Input.onInput ChangeEmail, Input.placeholder "E-mail" ]
+                    [ Input.email [ Input.onInput SiEmail, Input.placeholder "E-mail" ]
                     ]
                 ]
             ]
@@ -175,7 +260,7 @@ viewSignIn model =
             [ Grid.col []
                 [ div
                     [ class "m-1" ]
-                    [ Input.password [ Input.onInput ChangePassword, Input.placeholder "Password" ]
+                    [ Input.password [ Input.onInput SiPassword, Input.placeholder "Password" ]
                     ]
                 ]
             ]
@@ -183,7 +268,7 @@ viewSignIn model =
             [ Grid.col []
                 [ div
                     [ class "m-3" ]
-                    [ button [ onClick SendLogin ]
+                    [ button [ onClick SendSignIn ]
                         [ text "Login" ]
                     ]
                 ]
@@ -194,7 +279,7 @@ viewSignIn model =
                     []
                     (let
                         ( salt, hashedPassword ) =
-                            Pw.pwhash appSalt model.email model.password
+                            Pw.pwhash appSalt model.siEmail model.siPassword
                      in
                      [ label []
                         [ text <| "salt: " ++ salt ]
@@ -216,8 +301,8 @@ viewJoinNow model =
             [ Grid.col []
                 [ div
                     [ class "m-1" ]
-                    [ Input.email [ Input.onInput ChangeEmail, Input.placeholder "E-mail" ]
-                    , Input.email [ Input.onInput ChangeEmail, Input.placeholder "Reenter e-mail" ]
+                    [ Input.email [ Input.onInput JnEmail1, Input.placeholder "E-mail" ]
+                    , Input.email [ Input.onInput JnEmail2, Input.placeholder "Reenter e-mail" ]
                     ]
                 ]
             ]
@@ -225,8 +310,8 @@ viewJoinNow model =
             [ Grid.col []
                 [ div
                     [ class "m-1" ]
-                    [ Input.password [ Input.onInput ChangePassword, Input.placeholder "Password" ]
-                    , Input.password [ Input.onInput ChangePassword, Input.placeholder "Reenter password" ]
+                    [ Input.password [ Input.onInput JnPassword1, Input.placeholder "Password" ]
+                    , Input.password [ Input.onInput JnPassword2, Input.placeholder "Reenter password" ]
                     ]
                 ]
             ]
@@ -234,7 +319,7 @@ viewJoinNow model =
             [ Grid.col []
                 [ div
                     [ class "m-3" ]
-                    [ button [ onClick SendLogin ]
+                    [ button [ onClick SendJoinNow ]
                         [ text "Join now" ]
                     ]
                 ]

@@ -286,7 +286,7 @@ viewSignIn model =
                     [ class "m-3" ]
                     [ Button.button
                         [ Button.onClick SendSignIn
-                        , Button.primary
+                        , Button.outlinePrimary
                         , Button.disabled (disableSignIn model)
                         ]
                         [ text "Login" ]
@@ -341,7 +341,7 @@ viewJoinNow model =
                     [ class "m-3" ]
                     [ Button.button
                         [ Button.onClick SendJoinNow
-                        , Button.primary
+                        , Button.outlinePrimary
                         , Button.disabled (disableJoinNow model)
                         ]
                         [ text "Join now" ]

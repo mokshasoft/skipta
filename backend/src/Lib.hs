@@ -19,6 +19,8 @@ import Network.Wai.Logger (withStdoutLogger)
 import Options.Applicative
 import Servant
 
+import API as API
+
 configDefaultPort :: Int
 configDefaultPort = 8080
 
@@ -26,29 +28,6 @@ data Opts = Opts
   { debug :: Bool
   , port  :: Int
   }
-
-data SignIn = SignIn
-  { salt :: String
-  , password :: String
-  } deriving (Eq)
-
-data JoinNow = JoinNow
-  { salt :: String
-  , password :: String
-  } deriving (Eq)
-
-instance Show SignIn where
-  show (SignIn s p) = "SignIn {salt=" ++ show s ++ ", password=" ++ show p ++ "}"
-
-instance Show JoinNow where
-  show (JoinNow s p) = "JoinNow {salt=" ++ show s ++ ", password=" ++ show p ++ "}"
-
-$(deriveJSON defaultOptions ''SignIn)
-$(deriveJSON defaultOptions ''JoinNow)
-
-type API =
-    "signin" :> ReqBody '[JSON] SignIn :> Post '[JSON] NoContent :<|>
-    "joinnow" :> ReqBody '[JSON] JoinNow :> Post '[JSON] NoContent
 
 -- type Middleware = Application -> Application
 corsPolicy :: Middleware
@@ -75,14 +54,14 @@ options = Opts
         <> metavar "PORT"
         )
 
-startApp :: IO ()
-startApp = start =<< execParser opts
-  where
-    opts = info (options <**> helper)
-        ( fullDesc
-        <> progDesc "Start the skipta server"
-        <> header "Skipta server - share costs"
-        )
+server :: Server API.API
+server = API.endpoints
+
+api :: Proxy API.API
+api = Proxy
+
+app :: Application
+app = serve api server
 
 start :: Opts -> IO ()
 start (Opts dbg port) = do
@@ -91,23 +70,11 @@ start (Opts dbg port) = do
         let log = if dbg then setLogger logger else id
         in runSettings (setPort port $ log $ defaultSettings) $ corsPolicy $ app
 
-app :: Application
-app = serve api server
-
-api :: Proxy API
-api = Proxy
-
-signInH :: SignIn -> Handler NoContent
-signInH json = do
-    liftIO $ print json
-    return NoContent
-
-joinNowH :: JoinNow -> Handler NoContent
-joinNowH json = do
-    liftIO $ print json
-    return NoContent
-
-server :: Server API
-server =
-    signInH :<|>
-    joinNowH
+startApp :: IO ()
+startApp = start =<< execParser opts
+  where
+    opts = info (options <**> helper)
+        ( fullDesc
+        <> progDesc "Start the skipta server"
+        <> header "Skipta server - share costs"
+        )

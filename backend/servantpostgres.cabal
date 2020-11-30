@@ -23,7 +23,9 @@ source-repository head
 
 library
   exposed-modules:
+      API
       Lib
+      Users
   other-modules:
       Paths_servantpostgres
   hs-source-dirs:

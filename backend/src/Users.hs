@@ -1,8 +1,5 @@
-{-# LANGUAGE DataKinds       #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeOperators   #-}
 module Users
     ( signInH
     , joinNowH
@@ -13,12 +10,6 @@ module Users
 import Control.Monad.IO.Class (liftIO)
 import Data.Aeson
 import Data.Aeson.TH
-import Data.Semigroup ((<>))
-import Network.Wai (Middleware)
-import Network.Wai.Middleware.Cors (cors, simpleCorsResourcePolicy, corsMethods, corsRequestHeaders)
-import Network.Wai.Handler.Warp (runSettings, setPort, setLogger, defaultSettings)
-import Network.Wai.Logger (withStdoutLogger)
-import Options.Applicative
 import Servant
 
 data SignIn = SignIn

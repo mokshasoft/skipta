@@ -1,16 +1,11 @@
 {-# LANGUAGE DataKinds       #-}
-{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeOperators   #-}
 module Lib
     ( startApp
     , app
     ) where
 
 import Control.Monad.IO.Class (liftIO)
-import Data.Aeson
-import Data.Aeson.TH
 import Data.Semigroup ((<>))
 import Network.Wai (Middleware)
 import Network.Wai.Middleware.Cors (cors, simpleCorsResourcePolicy, corsMethods, corsRequestHeaders)

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           servantpostgres
+name:           skipta
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/servantpostgres#readme>
 homepage:       https://github.com/githubuser/servantpostgres#readme
@@ -27,7 +27,7 @@ library
       Lib
       Users
   other-modules:
-      Paths_servantpostgres
+      Paths_skipta
   hs-source-dirs:
       src
   build-depends:
@@ -41,10 +41,10 @@ library
     , warp
   default-language: Haskell2010
 
-executable servantpostgres-exe
+executable skipta
   main-is: Main.hs
   other-modules:
-      Paths_servantpostgres
+      Paths_skipta
   hs-source-dirs:
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -53,18 +53,18 @@ executable servantpostgres-exe
     , base
     , optparse-applicative
     , servant-server
-    , servantpostgres
+    , skipta
     , wai
     , wai-cors
     , wai-logger
     , warp
   default-language: Haskell2010
 
-test-suite servantpostgres-test
+test-suite skipta-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_servantpostgres
+      Paths_skipta
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -76,7 +76,7 @@ test-suite servantpostgres-test
     , hspec-wai-json
     , optparse-applicative
     , servant-server
-    , servantpostgres
+    , skipta
     , wai
     , wai-cors
     , wai-logger

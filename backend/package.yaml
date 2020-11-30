@@ -1,4 +1,4 @@
-name:                servantpostgres
+name:                skipta
 version:             0.1.0.0
 github:              "githubuser/servantpostgres"
 license:             BSD3
@@ -32,7 +32,7 @@ library:
   source-dirs: src
 
 executables:
-  servantpostgres-exe:
+  skipta:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -41,10 +41,10 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - base
-    - servantpostgres
+    - skipta
 
 tests:
-  servantpostgres-test:
+  skipta-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -53,7 +53,7 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - base
-    - servantpostgres
+    - skipta
     - hspec
     - hspec-wai
     - hspec-wai-json

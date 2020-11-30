@@ -31,13 +31,23 @@ data SignIn = SignIn
   , password :: String
   } deriving (Eq)
 
+data JoinNow = JoinNow
+  { jnSalt :: String
+  , jnPassword :: String
+  } deriving (Eq)
+
 instance Show SignIn where
   show (SignIn s p) = "SignIn {salt=" ++ show s ++ ", password=" ++ show p ++ "}"
 
+instance Show JoinNow where
+  show (JoinNow s p) = "JoinNow {salt=" ++ show s ++ ", password=" ++ show p ++ "}"
+
 $(deriveJSON defaultOptions ''SignIn)
+$(deriveJSON defaultOptions ''JoinNow)
 
 type API =
-    "signin" :> ReqBody '[JSON] SignIn :> Post '[JSON] NoContent
+    "signin" :> ReqBody '[JSON] SignIn :> Post '[JSON] NoContent :<|>
+    "joinnow" :> ReqBody '[JSON] JoinNow :> Post '[JSON] NoContent
 
 -- type Middleware = Application -> Application
 corsPolicy :: Middleware
@@ -91,5 +101,12 @@ signInH json = do
     liftIO $ print json
     return NoContent
 
+joinNowH :: JoinNow -> Handler NoContent
+joinNowH json = do
+    liftIO $ print json
+    return NoContent
+
 server :: Server API
-server = signInH
+server =
+    signInH :<|>
+    joinNowH

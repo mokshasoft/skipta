@@ -89,44 +89,36 @@ init _ =
 -- HTTP
 
 
-encodeSignIn : String -> String -> E.Value
-encodeSignIn salt hashedPassword =
+encodeAuthentication : String -> String -> E.Value
+encodeAuthentication salt hashedPassword =
     E.object
-        [ ( "salt", E.string salt )
-        , ( "password", E.string hashedPassword )
+        [ ( "email", E.string salt )
+        , ( "hashedPassword", E.string hashedPassword )
         ]
 
 
 sendSignIn : String -> String -> Cmd Msg
 sendSignIn email password =
     let
-        ( salt, hashedPassword ) =
+        hashedPassword =
             Pw.pwhash appSalt email password
     in
     Http.post
         { url = signInEndpoint
-        , body = Http.jsonBody (encodeSignIn salt hashedPassword)
+        , body = Http.jsonBody (encodeAuthentication email hashedPassword)
         , expect = Http.expectWhatever ReceiveSignIn
         }
-
-
-encodeJoinNow : String -> String -> E.Value
-encodeJoinNow salt hashedPassword =
-    E.object
-        [ ( "salt", E.string salt )
-        , ( "password", E.string hashedPassword )
-        ]
 
 
 sendJoinNow : String -> String -> Cmd Msg
 sendJoinNow email password =
     let
-        ( salt, hashedPassword ) =
+        hashedPassword =
             Pw.pwhash appSalt email password
     in
     Http.post
         { url = joinNowEndpoint
-        , body = Http.jsonBody (encodeJoinNow salt hashedPassword)
+        , body = Http.jsonBody (encodeAuthentication email hashedPassword)
         , expect = Http.expectWhatever ReceiveJoinNow
         }
 
@@ -298,12 +290,10 @@ viewSignIn model =
                 [ div
                     []
                     (let
-                        ( salt, hashedPassword ) =
+                        hashedPassword =
                             Pw.pwhash appSalt model.siEmail model.siPassword
                      in
                      [ label []
-                        [ text <| "salt: " ++ salt ]
-                     , label []
                         [ text <| "hash: " ++ hashedPassword ]
                      ]
                     )

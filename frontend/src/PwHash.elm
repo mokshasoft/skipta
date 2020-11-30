@@ -6,7 +6,7 @@ import Word.Bytes as Bytes
 import Word.Hex as Hex
 
 
-pwhash : String -> String -> String -> ( String, String )
+pwhash : String -> String -> String -> String
 pwhash appSalt email password =
     let
         digest =
@@ -27,4 +27,4 @@ pwhash appSalt email password =
                 |> digest password
                 |> Hex.fromByteList
     in
-    ( salt, hashedPassword )
+    hashedPassword

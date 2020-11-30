@@ -13,20 +13,20 @@ import Data.Aeson.TH
 import Servant
 
 data SignIn = SignIn
-  { salt :: String
-  , password :: String
+  { email :: String
+  , hashedPassword :: String
   } deriving (Eq)
 
 data JoinNow = JoinNow
-  { salt :: String
-  , password :: String
+  { email :: String
+  , hashedPassword :: String
   } deriving (Eq)
 
 instance Show SignIn where
-  show (SignIn s p) = "SignIn {salt=" ++ show s ++ ", password=" ++ show p ++ "}"
+  show (SignIn s p) = "SignIn {email=" ++ show s ++ ", hashedPassword=" ++ show p ++ "}"
 
 instance Show JoinNow where
-  show (JoinNow s p) = "JoinNow {salt=" ++ show s ++ ", password=" ++ show p ++ "}"
+  show (JoinNow s p) = "JoinNow {email=" ++ show s ++ ", hashedPassword=" ++ show p ++ "}"
 
 $(deriveJSON defaultOptions ''SignIn)
 $(deriveJSON defaultOptions ''JoinNow)

@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds       #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeOperators   #-}
@@ -32,8 +33,8 @@ data SignIn = SignIn
   } deriving (Eq)
 
 data JoinNow = JoinNow
-  { jnSalt :: String
-  , jnPassword :: String
+  { salt :: String
+  , password :: String
   } deriving (Eq)
 
 instance Show SignIn where

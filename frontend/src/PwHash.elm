@@ -1,7 +1,6 @@
 module PwHash exposing (pwhash)
 
 import Crypto.HMAC as HMAC
-import Crypto.Hash as Hash
 import Word.Bytes as Bytes
 import Word.Hex as Hex
 

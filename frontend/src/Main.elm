@@ -402,7 +402,7 @@ view model =
         [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
         , Navbar.config NavbarMsg
             |> Navbar.withAnimation
-            |> Navbar.brand [ href "#" ] [ text "Skipta" ]
+            |> Navbar.brand [ href "#" ] [ img [ src "../assets/logo.svg", style "width" "50px", style "background-size" "contain" ] [], text "  Skipta" ]
             |> Navbar.customItems
                 [ Navbar.textItem [] [ viewAuthModal model ] ]
             |> Navbar.view model.navbarState

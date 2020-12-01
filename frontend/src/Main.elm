@@ -48,6 +48,7 @@ joinNowEndpoint =
 -- MAIN
 
 
+main : Program () Model Msg
 main =
     Browser.element
         { init = init
@@ -111,6 +112,7 @@ encodeAuthentication salt hashedPassword =
 sendSignIn : String -> String -> Cmd Msg
 sendSignIn email password =
     let
+        hashedPassword : String
         hashedPassword =
             Pw.pwhash appSalt email password
     in
@@ -124,6 +126,7 @@ sendSignIn email password =
 sendJoinNow : String -> String -> Cmd Msg
 sendJoinNow email password =
     let
+        hashedPassword : String
         hashedPassword =
             Pw.pwhash appSalt email password
     in

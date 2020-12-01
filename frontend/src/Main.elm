@@ -6,6 +6,7 @@ import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Modal as Modal
+import Bootstrap.Navbar as Navbar
 import Bootstrap.Tab as Tab
 import Browser
 import Html exposing (..)
@@ -62,6 +63,7 @@ main =
 
 type alias Model =
     { authVisibility : Modal.Visibility
+    , navbarState : Navbar.State
     , tabState : Tab.State
     , siEmail : String
     , siPassword : String
@@ -75,7 +77,12 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
+    let
+        ( navbarState, navbarCmd ) =
+            Navbar.initialState NavbarMsg
+    in
     ( { authVisibility = Modal.hidden
+      , navbarState = navbarState
       , tabState = Tab.initialState
       , siEmail = ""
       , siPassword = ""
@@ -85,7 +92,7 @@ init _ =
       , jnPassword2 = ""
       , debugMsg = ""
       }
-    , Cmd.none
+    , navbarCmd
     )
 
 
@@ -133,6 +140,7 @@ sendJoinNow email password =
 
 type Msg
     = AuthModal Modal.Visibility
+    | NavbarMsg Navbar.State
     | TabMsg Tab.State
     | SiEmail String
     | SiPassword String
@@ -153,6 +161,11 @@ update msg model =
             ( { model
                 | authVisibility = state
               }
+            , Cmd.none
+            )
+
+        NavbarMsg state ->
+            ( { model | navbarState = state }
             , Cmd.none
             )
 
@@ -244,7 +257,10 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Tab.subscriptions model.tabState TabMsg
+    Sub.batch
+        [ Tab.subscriptions model.tabState TabMsg
+        , Navbar.subscriptions model.navbarState NavbarMsg
+        ]
 
 
 
@@ -342,7 +358,7 @@ viewAuthModal model =
     Grid.container []
         [ Button.button
             [ Button.attrs [ onClick (AuthModal Modal.shown) ] ]
-            [ text "Sign In/Join Now" ]
+            [ text "Account" ]
         , Modal.config (AuthModal Modal.hidden)
             |> Modal.small
             |> Modal.h5 [] [ text "Sign In/Join Now" ]
@@ -381,11 +397,10 @@ view : Model -> Html Msg
 view model =
     Grid.container []
         [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
-        , Grid.row []
-            [ Grid.col []
-                [ div []
-                    [ viewAuthModal model
-                    ]
-                ]
-            ]
+        , Navbar.config NavbarMsg
+            |> Navbar.withAnimation
+            |> Navbar.brand [ href "#" ] [ text "Skipta" ]
+            |> Navbar.customItems
+                [ Navbar.textItem [] [ viewAuthModal model ] ]
+            |> Navbar.view model.navbarState
         ]

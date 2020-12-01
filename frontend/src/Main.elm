@@ -4,6 +4,8 @@ import Bootstrap.Button as Button
 import Bootstrap.CDN as CDN
 import Bootstrap.Form.Input as Input
 import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Modal as Modal
 import Bootstrap.Tab as Tab
 import Browser
 import Html exposing (..)
@@ -59,7 +61,8 @@ main =
 
 
 type alias Model =
-    { tabState : Tab.State
+    { authVisibility : Modal.Visibility
+    , tabState : Tab.State
     , siEmail : String
     , siPassword : String
     , jnEmail1 : String
@@ -72,7 +75,8 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { tabState = Tab.initialState
+    ( { authVisibility = Modal.hidden
+      , tabState = Tab.initialState
       , siEmail = ""
       , siPassword = ""
       , jnEmail1 = ""
@@ -128,7 +132,8 @@ sendJoinNow email password =
 
 
 type Msg
-    = TabMsg Tab.State
+    = AuthModal Modal.Visibility
+    | TabMsg Tab.State
     | SiEmail String
     | SiPassword String
     | JnEmail1 String
@@ -144,6 +149,13 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        AuthModal state ->
+            ( { model
+                | authVisibility = state
+              }
+            , Cmd.none
+            )
+
         TabMsg state ->
             ( { model | tabState = state }
             , Cmd.none
@@ -285,22 +297,6 @@ viewSignIn model =
                     ]
                 ]
             ]
-        , Grid.row []
-            [ Grid.col []
-                [ div
-                    []
-                    (let
-                        hashedPassword =
-                            Pw.pwhash appSalt model.siEmail model.siPassword
-                     in
-                     [ label []
-                        [ text <| "hash: " ++ hashedPassword ]
-                     ]
-                    )
-                , label []
-                    [ text <| "debug message: " ++ model.debugMsg ]
-                ]
-            ]
         ]
 
 
@@ -341,13 +337,17 @@ viewJoinNow model =
         ]
 
 
-view : Model -> Html Msg
-view model =
+viewAuthModal : Model -> Html Msg
+viewAuthModal model =
     Grid.container []
-        [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
-        , Grid.row []
-            [ Grid.col []
-                [ div []
+        [ Button.button
+            [ Button.attrs [ onClick (AuthModal Modal.shown) ] ]
+            [ text "Sign In/Join Now" ]
+        , Modal.config (AuthModal Modal.hidden)
+            |> Modal.small
+            |> Modal.h5 [] [ text "Sign In/Join Now" ]
+            |> Modal.body []
+                [ Grid.containerFluid []
                     [ Tab.config TabMsg
                         |> Tab.withAnimation
                         |> Tab.center
@@ -364,6 +364,27 @@ view model =
                                 }
                             ]
                         |> Tab.view model.tabState
+                    ]
+                ]
+            |> Modal.footer []
+                [ Button.button
+                    [ Button.outlinePrimary
+                    , Button.attrs [ onClick (AuthModal Modal.hidden) ]
+                    ]
+                    [ text "Close" ]
+                ]
+            |> Modal.view model.authVisibility
+        ]
+
+
+view : Model -> Html Msg
+view model =
+    Grid.container []
+        [ CDN.stylesheet -- creates an inline style node with the Bootstrap CSS
+        , Grid.row []
+            [ Grid.col []
+                [ div []
+                    [ viewAuthModal model
                     ]
                 ]
             ]
